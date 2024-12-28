@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Esc Mikl's Voicevision 04 Rating</title>
+    <style>
+        body {
+            font-family: Montserrat, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-image: url('https://i.imgur.com/Z1VeuIE.png');
+            background-size: cover;
+            background-repeat: no-repeat;
+        }
+
+        #container {
+            width: 90%;
+            max-width: 600px;
+            padding: 20px;
+            background: #ffe5e5;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 1.8em;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+        }
+
+        li {
+            position: relative;
+            padding: 10px;
+            margin: 5px 0;
+            background: #ffffff;
+            border-radius: 5px;
+            cursor: grab;
+            text-align: left;
+            color: black; /* Default text color */
+        }
+
+        li.dragging {
+            opacity: 0.5;
+            background: #d1d5dd;
+        }
+
+        li::after {
+            content: attr(data-rank);
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 14px;
+            color: rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+
+        li.gold {
+            background: linear-gradient(to right, white, gold) !important;
+        }
+
+        li.silver {
+            background: linear-gradient(to right, white, silver) !important;
+        }
+
+        li.bronze {
+            background: linear-gradient(to right, white, #cd7f32) !important; /* Bronze color */
+        }
+
+        li.red {
+            background: linear-gradient(to right, white, red) !important;
+            color: black !important; /* Ensure text stays black */
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <h1>mikl's VSC 04</h1>
+        <p>drag and drop the participants to create your ranking</p>
+        <ul id="countryList">
+            <li draggable="true" data-rank="1">
+                <img src="https://i.imgur.com/RPMxVYN.png" alt="Sofia Image" style="width: 30px; height: 20px; margin-right: 10px; vertical-align: middle;">
+                Sofia - Bulgaria
+                <div style="font-size: 12px; color: gray;">✙ toshev - warrior</div>
+            </li>
+            <li draggable="true" data-rank="2">
+                <img src="https://i.imgur.com/AGRD5el.png" alt="Yerevan Image" style="width: 30px; height: 20px; margin-right: 10px; vertical-align: middle;">
+                Yerevan - Armenia
+                <div style="font-size: 12px; color: gray;">✙ azealia - gloom</div>
+            </li>
+            <li draggable="true" data-rank="3">
+                <img src="https://i.imgur.com/BA3s6G6.png" alt="Cesano Image" style="width: 30px; height: 20px; margin-right: 10px; vertical-align: middle;">
+                Cesano - Italy
+                <div style="font-size: 12px; color: gray;">✙ mrkawaii, hayden - Beverly blossom & diana diamond</div>
+            </li>
+            <li draggable="true" data-rank="4">
+                <img src="https://i.imgur.com/l2PqiBW.png" alt="Kenya Image" style="width: 30px; height: 20px; margin-right: 10px; vertical-align: middle;">
+                Nairobi - Kenya
+                <div style="font-size: 12px; color: gray;">✙ tricon - mirror of you</div>
+            </li>
+            <li draggable="true" data-rank="5">
+                <img src="https://i.imgur.com/8fzntTS.gif" alt="Sweden Image" style="width: 30px; height: 20px; margin-right: 10px; vertical-align: middle;">
+                Örebro - Sweden
+                <div style="font-size: 12px; color: gray;">✙ timso - hollow</div>
+            </li>
+        </ul>
+    </div>
+
+    <script>
+        const list = document.getElementById('countryList');
+
+        let draggedItem = null;
+
+        list.addEventListener('dragstart', (e) => {
+            draggedItem = e.target;
+            e.target.classList.add('dragging');
+        });
+
+        list.addEventListener('dragend', (e) => {
+            e.target.classList.remove('dragging');
+            draggedItem = null;
+
+            const items = Array.from(list.children);
+
+            // Reset all items' background, text color, and rank
+            items.forEach((item, index) => {
+                item.classList.remove('gold', 'silver', 'bronze', 'red');
+                item.style.background = '#ffffff';
+                item.style.color = 'black'; // Reset text color
+                item.setAttribute('data-rank', index + 1); // Update rank number
+            });
+
+            // Update first place to gold
+            if (items[0]) {
+                items[0].classList.add('gold');
+            }
+
+            // Update second place to silver
+            if (items[1]) {
+                items[1].classList.add('silver');
+            }
+
+            // Update third place to bronze
+            if (items[2]) {
+                items[2].classList.add('bronze');
+            }
+
+            // Update last place to red
+            if (items[items.length - 1]) {
+                items[items.length - 1].classList.add('red');
+            }
+        });
+
+        list.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            const afterElement = getDragAfterElement(list, e.clientY);
+            if (afterElement == null) {
+                list.appendChild(draggedItem);
+            } else {
+                list.insertBefore(draggedItem, afterElement);
+            }
+        });
+
+        function getDragAfterElement(container, y) {
+            const draggableElements = [...container.querySelectorAll('li:not(.dragging)')];
+
+            return draggableElements.reduce((closest, child) => {
+                const box = child.getBoundingClientRect();
+                const offset = y - box.top - box.height / 2;
+                if (offset < 0 && offset > closest.offset) {
+                    return { offset: offset, element: child };
+                } else {
+                    return closest;
+                }
+            }, { offset: Number.NEGATIVE_INFINITY }).element;
+        }
+    </script>
+</body>
+</html>
